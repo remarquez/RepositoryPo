@@ -11,6 +11,9 @@ public class RunTicketMiner{
   public static void main(String []args)throws IOException {
     try {
       boolean flag = true;
+      boolean temp = true;
+      double totalTemp = 0;
+      double customerTotalTemp = 0;
       String exit = "";
       int eventCounter = eventNumber();
       Customers customer[] = customerGenerator();
@@ -29,6 +32,7 @@ public class RunTicketMiner{
           String lastName = input.nextLine();
           System.out.println("Press l to login or c to conitnue as a guest");
           char c = input.next().charAt(0);
+          c = Character.toLowerCase(c);
           input.nextLine();
           if (c == 'l') {
             while (flag == true) {
@@ -37,135 +41,179 @@ public class RunTicketMiner{
               System.out.println("Enter your Password");
               String password = input.nextLine();
               boolean log = logIn(customer, username, password);
+              int customerID = logInID(customer, username, password);
               if (log == true) {
+                System.out.println("Welcome "+customer[customerID].getName()+" "+ customer[customerID].getLast()+'\n');
+                while (true) {
                   System.out.println("if you want to see all the events enter [all] if you want to search an event enter [search]");
                   String adminSearch = input.nextLine().toLowerCase();
-                  if (adminSearch.equals("search")) {
+                  while (true) {
+                    if (adminSearch.equals("search")) {
                       System.out.println("Enter the A to inquiere the event by ID of the event or B to inquire by the name");
                       String adminInquire = input.nextLine().toLowerCase();
                       if (adminInquire.equals("a")) {
-                          System.out.println("Please enter the ID");
-                          int temp = input.nextInt();
-                          input.nextLine();
-                          printCustomerInquire(p, temp, "");
+                        System.out.println("Please enter the ID");
+                        int temp1 = input.nextInt();
+                        input.nextLine();
+                        printCustomerInquire(p, temp1, "");
                       }
-                      else if (adminInquire.equals("b")) {
-                          System.out.println("Please enter the Name");
-                          String nameLogIn = input.nextLine();
-                          printCustomerInquire(p, 0, nameLogIn);
-
+                      if (adminInquire.equals("b")) {
+                        System.out.println("Please enter the Name");
+                        String eventName = input.nextLine();
+                        printCustomerInquire(p, 0, name);
                       }
-                  }
-                  else if (adminSearch.equals("all")) {
+                    } else if (adminSearch.equals("all")) {
                       for (int f = 0; f < p.length; f++) {
-                          p[f].printTicketInfo();
+                        p[f].printTicketInfo();
                       }
+                    }
+                    System.out.println("Would you like to see another event? Enter [y] to continue or [n] to exit ");
+                    String eventAnswer = input.nextLine().toLowerCase();
+                    if (!eventAnswer.equals("y")) {
+                      break;
+                    } else if (adminSearch.equals("all")) {
+                      for (int f = 0; f < p.length; f++) {
+                        p[f].printTicketInfo();
+                      }
+                    }
                   }
-                  else{
-                      System.out.println("Invalid input please try again");
+                  System.out.println("Which Event would you like to buy tickets for" + '\n' + "Please Enter the ID");
+                  int ticket = input.nextInt();
+                  input.nextLine();
+                  System.out.println("Please enter the seat you would like to purchase: [VIP,Gold,Silver,Bronzer or General]");
+                  String seat = input.nextLine().toLowerCase();
+                  System.out.println("How many tickets are you buying (from 2 to 7 only)");
+                  int ticketsBought = input.nextInt();
+                  input.nextLine();
+                  if (ticketsBought > 1 && ticketsBought <= 7) {
+                    for (int i = 0; i < ticketsBought; i++) {
+                      t[i] = new Ticket(printById(p, ticket, seat), confirmationNumberMethod());
+                      t[i].setQuantityTickets(t[i].getQuantityTickets() - i);
+                      totalTemp += printById(p, ticket, seat);
+                      if(totalTemp <= customer[customerID].getMoneyAvailable()) {
+                        t[i].printTicketInfo();
+                        customerTotalTemp -= totalTemp;
+                        customer[customerID].setMoneyAvailable(customer[customerID].getMoneyAvailable()- customerTotalTemp);
+                      }else{
+                        System.out.println("You dont have enough money"+'\n');
+                      }
+                      temp = false;
+                    }
+                    System.out.println("Your Total is: "+totalTemp+'\n');
+                    System.out.println("Your new balance is: "+customer[customerID].getMoneyAvailable()+'\n'+ "Thanks for buying a ticket"+'\n');
+                    break;
+                  } else {
+                    System.out.println("You can only buy 7 tickets max");
                   }
-                System.out.println("Which Event would you like to buy tickets for" + '\n' + "Please Enter the ID");
-                int ticket = input.nextInt();
-                input.nextLine();
-                System.out.println("Please enter the seat you would like to purchase: [VIP,Gold,Silver,Bronzer or General]");
-                String seat = input.nextLine().toLowerCase();
-                t = new Ticket[eventCounter];
-                printById(p, ticket, seat);
-                flag = false;
-                System.out.println("Thank you for purchasing your ticket");
-                System.out.println("If you want to exit please enter EXIT otherwise enter any letter");
-                exit = input.nextLine();
+
+                }
               } else {
                 System.out.println("Sorry the username of password was incorrect please try again" + '\n');
               }
+              flag = false;
             }
-          }
+            }
           //GUEST SECTION
           else if (c == 'c') {
             System.out.println("You are continuing as a guest" + '\n');
             System.out.println("If you want to see all the events enter [all] if you want to search an event enter [search]");
+            String adminSearch = input.nextLine().toLowerCase();
+            while (true) {
+              if (adminSearch.equals("search")) {
+                System.out.println("Enter the A to inquiere the event by ID of the event or B to inquire by the name");
+                String adminInquire = input.nextLine().toLowerCase();
+                if (adminInquire.equals("a")) {
+                  System.out.println("Please enter the ID");
+                  int temp1 = input.nextInt();
+                  input.nextLine();
+                  printCustomerInquire(p, temp1, "");
+                }
+                if (adminInquire.equals("b")) {
+                  System.out.println("Please enter the Name");
+                  String eventName = input.nextLine();
+                  printCustomerInquire(p, 0, name);
+                }
+              }
+              else if (adminSearch.equals("all")) {
+                for (int f = 0; f < p.length; f++) {
+                  p[f].printTicketInfo();
+                }
+              }
+              System.out.println("Would you like to see another event? Enter [y] to continue or [n] to exit ");
+              String eventAnswer = input.nextLine().toLowerCase();
+              if (!eventAnswer.equals("y")) {
+                break;
+              }
+              else if (adminSearch.equals("all")) {
+                for (int f = 0; f < p.length; f++) {
+                  p[f].printTicketInfo();
+                }
+              }
+            }
+              System.out.println("Which Event would you like to buy tickets for" + '\n' + "Please Enter the ID");
+              int ticket = input.nextInt();
+              input.nextLine();
+              System.out.println("Please enter the seat you would like to purchase: [VIP,Gold,Silver,Bronzer or General]");
+              String seat = input.nextLine().toLowerCase();
+              while(temp != false) {
+                System.out.println("How many tickets are you buying (from 2 to 7 only)");
+                int ticketsBought = input.nextInt();
+                if (ticketsBought > 1 && ticketsBought <= 7) {
+                  for (int i = 0; i < ticketsBought; i++){
+                    t[i] = new Ticket(printById(p, ticket, seat),confirmationNumberMethod());
+                    t[i].setQuantityTickets(t[i].getQuantityTickets()-i);
+                    t[i].printTicketInfo();
+                    temp = false;
+                  }
+                  System.out.println("Thank you for purchasing your ticket"+'\n');
+                } else {
+                  System.out.println("You can only buy 7 tickets max"+'\n');
+                }
+              }
+
+            }
+          }
+          // ADMINISTRATOR SECTION
+          if (answer == 'n') {
+            System.out.println("You are accesing as an administrator" + '\n');
+            System.out.println("if you want to see all the events enter [all] if you want to search an event enter [search]");
             String adminSearch = input.nextLine().toLowerCase();
             if (adminSearch.equals("search")) {
               System.out.println("Enter the A to inquiere the event by ID of the event or B to inquire by the name");
               String adminInquire = input.nextLine().toLowerCase();
               if (adminInquire.equals("a")) {
                 System.out.println("Please enter the ID");
-                int temp = input.nextInt();
+                int temp1 = input.nextInt();
                 input.nextLine();
-                printCustomerInquire(p, temp, "");
-              }
-              if (adminInquire.equals("b")) {
+                if (t[0] != null) {
+                  printAdminInquire(t, temp1, "");
+                } else {
+                  System.out.println("No tickets bought yet" + '\n');
+                }
+              } else if (adminInquire.equals("b")) {
                 System.out.println("Please enter the Name");
-                String eventName = input.nextLine();
-                printCustomerInquire(p, 0, name);
+                String nameAdmin = input.nextLine();
+                if (t[0] != null) {
+                  printAdminInquire(t, 0, nameAdmin);
+                } else {
+                  System.out.println("No tickets bought yet" + '\n');
+                }
               }
             } else if (adminSearch.equals("all")) {
-              for (int f = 0; f < p.length; f++) {
-                p[f].printTicketInfo();
-              }
-            }
-          } else {
-            System.out.println("Sorry Invalid input please try again");
-          }
-          System.out.println("Which Event would you like to buy tickets for" + '\n' + "Please Enter the ID");
-          int ticket = input.nextInt();
-          input.nextLine();
-          System.out.println("Please enter the seat you would like to purchase: [VIP,Gold,Silver,Bronzer or General]");
-          String seat = input.nextLine().toLowerCase();
-
-          t[0] = new Ticket(printById(p, ticket, seat), confirmationNumberMethod());
-          t[0].printTicketInfo();
-          System.out.println("Thank you for purchasing your ticket");
-        }
-        // ADMINISTRATOR SECTION
-        if (answer == 'n') {
-          System.out.println("You are accesing as an administrator" + '\n');
-          System.out.println("if you want to see all the events enter [all] if you want to search an event enter [search]");
-          String adminSearch = input.nextLine().toLowerCase();
-          if (adminSearch.equals("search")) {
-            System.out.println("Enter the A to inquiere the event by ID of the event or B to inquire by the name");
-            String adminInquire = input.nextLine().toLowerCase();
-            if (adminInquire.equals("a")) {
-              System.out.println("Please enter the ID");
-              int temp = input.nextInt();
-              input.nextLine();
               if (t[0] != null) {
-                printAdminInquire(t, temp, "");
+                for (int f = 0; f < t.length; f++) {
+                  System.out.println(t[f].toString());
+                }
               } else {
                 System.out.println("No tickets bought yet" + '\n');
               }
-            }
-              else if (adminInquire.equals("b")) {
-                System.out.println("Please enter the Name");
-                String name = input.nextLine();
-                if(t[0] != null){
-                printAdminInquire(t, 0, name);
-              }
-                else{
-                  System.out.println("No tickets bought yet"+'\n');
-                }
+            } else {
+              System.out.println("Invalid input please try again" + '\n');
             }
           }
-          else if (adminSearch.equals("all")) {
-            if(t[0] != null){
-            for (int f = 0; f < t.length; f++) {
-              System.out.println(t[f].toString());
-            }
-          }
-            else {
-              System.out.println("No tickets bought yet"+'\n');
-            }
-            }
-          else{
-              System.out.println("Invalid input please try again"+'\n');
-          }
+          System.out.println("If you want to exit please enter EXIT otherwise enter any letter");
+          exit = input.nextLine().toUpperCase();
         }
-        else{
-            System.out.println("invalid input please try again"+'\n');
-        }
-        System.out.println("If you want to exit please enter EXIT otherwise enter any letter");
-        exit = input.nextLine().toUpperCase();
-      }
     }catch(FileNotFoundException file){
       System.out.println(file);
     }
@@ -177,9 +225,17 @@ public class RunTicketMiner{
    * it returns a boolean confirming if its true or not
    *
    */
-  public static boolean logIn(Customers[] c,String username, String password){
+  public  static int logInID(Customers[] c,String username, String password) {
+    int customerID = 0;
+    for(int i = 0; i < c.length; i++) {
+      if (c[i].getUsername().equals(username) && c[i].getPassword().equals(password)) {
+        customerID = i;
+      }
+    }
+    return customerID;
+  }
+  public static boolean logIn(Customers[] c,String username, String password) {
     boolean flag = false;
-    int id =  0;
     for(int i=0; i < c.length; i++){
       if(c[i].getUsername().equals(username)&& c[i].getPassword().equals(password)){
         flag = true;
@@ -187,10 +243,7 @@ public class RunTicketMiner{
     }
     return flag;
   }
- /* public void updateTickets() {
 
-  }*/
-  }
   public static void printAdminInquire(Ticket[] c,int temp, String adminInquire){
     for(int i=0; i < c.length; i++){
       if(c[i].getID()== temp || c[i].getName().equals(adminInquire)){
@@ -221,7 +274,7 @@ public class RunTicketMiner{
       if(e[i].getID() == t){
         if(seat.equals("vip")){
           price = e[i].getVipPrice();
-          set
+
         }
         else if(seat.equals("gold")){
           price = e[i].getGoldPrice();
@@ -319,6 +372,7 @@ public class RunTicketMiner{
       if(!line.contains(matches[checker])){
         counterEvents++;
         checker++;
+        //System.out.println(checker);
       }
       checker = 0;
     }
@@ -354,6 +408,7 @@ public class RunTicketMiner{
         event[adder] = m;
         adder++;
         //m.printTicketInfo();
+        //System.out.println(checker);
 
       }
       checker = 0;
