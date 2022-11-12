@@ -4,6 +4,8 @@
  *
  */
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.lang.*;
 
@@ -12,12 +14,18 @@ public class RunTicketMiner{
     try {
       boolean flag = true;
       boolean temp = true;
+      double texasSalesTax = 1.0825;
+      double membershipDiscount = .10;
+      double tempTotal = 0;
       double totalTemp = 0;
       double customerTotalTemp = 0;
+      int temp1 = 0;
+
       String exit = "";
       int eventCounter = eventNumber();
       Customers customer[] = customerGenerator();
       Ticket t[] = new Ticket[eventCounter];
+      Venue v[] = venueGenerator();
       Scanner input = new Scanner(System.in);
       Event p[] = eventGenerator(eventCounter, 0, 0);
       while (!exit.equals("EXIT")) {
@@ -49,18 +57,18 @@ public class RunTicketMiner{
                   String adminSearch = input.nextLine().toLowerCase();
                   while (true) {
                     if (adminSearch.equals("search")) {
-                      System.out.println("Enter the A to inquiere the event by ID of the event or B to inquire by the name");
+                      System.out.println("Enter the A to inquire the event by ID of the event or B to inquire by the name");
                       String adminInquire = input.nextLine().toLowerCase();
                       if (adminInquire.equals("a")) {
                         System.out.println("Please enter the ID");
-                        int temp1 = input.nextInt();
+                         temp1 = input.nextInt();
                         input.nextLine();
                         printCustomerInquire(p, temp1, "");
                       }
                       if (adminInquire.equals("b")) {
                         System.out.println("Please enter the Name");
                         String eventName = input.nextLine();
-                        printCustomerInquire(p, 0, name);
+                        printCustomerInquire(p, 0, eventName);
                       }
                     } else if (adminSearch.equals("all")) {
                       for (int f = 0; f < p.length; f++) {
@@ -99,8 +107,20 @@ public class RunTicketMiner{
                       }
                       temp = false;
                     }
-                    System.out.println("Your Total is: "+totalTemp+'\n');
-                    System.out.println("Your new balance is: "+customer[customerID].getMoneyAvailable()+'\n'+ "Thanks for buying a ticket"+'\n');
+                    if(customer[customerID].getMembership() == true){
+                      tempTotal = totalTemp*membershipDiscount;
+                      customer[customerID].setTotalMembershipSaved(tempTotal);
+                      p[temp1].setTotalAmountDiscounted(tempTotal);
+                      totalTemp = totalTemp - tempTotal;
+                      totalTemp = totalTemp*texasSalesTax;
+                      System.out.println("Your Total is: " + totalTemp + '\n');
+                      System.out.println("Your new balance is: " + customer[customerID].getMoneyAvailable() + '\n' + "Thanks for buying a ticket" + '\n');
+
+                    }else {
+                      totalTemp = totalTemp * texasSalesTax;
+                      System.out.println("Your Total is: " + totalTemp + '\n');
+                      System.out.println("Your new balance is: " + customer[customerID].getMoneyAvailable() + '\n' + "Thanks for buying a ticket" + '\n');
+                    }
                     break;
                   } else {
                     System.out.println("You can only buy 7 tickets max");
@@ -124,7 +144,7 @@ public class RunTicketMiner{
                 String adminInquire = input.nextLine().toLowerCase();
                 if (adminInquire.equals("a")) {
                   System.out.println("Please enter the ID");
-                  int temp1 = input.nextInt();
+                  temp1 = input.nextInt();
                   input.nextLine();
                   printCustomerInquire(p, temp1, "");
                 }
@@ -161,6 +181,7 @@ public class RunTicketMiner{
                 if (ticketsBought > 1 && ticketsBought <= 7) {
                   for (int i = 0; i < ticketsBought; i++){
                     t[i] = new Ticket(printById(p, ticket, seat),confirmationNumberMethod());
+
                     t[i].setQuantityTickets(t[i].getQuantityTickets()-i);
                     t[i].printTicketInfo();
                     temp = false;
@@ -176,14 +197,14 @@ public class RunTicketMiner{
           // ADMINISTRATOR SECTION
           if (answer == 'n') {
             System.out.println("You are accesing as an administrator" + '\n');
-            System.out.println("if you want to see all the events enter [all] if you want to search an event enter [search]");
+            System.out.println("if you want to see all the events enter [all] if you want to search an event enter [search] or create and event enter [create]");
             String adminSearch = input.nextLine().toLowerCase();
             if (adminSearch.equals("search")) {
               System.out.println("Enter the A to inquiere the event by ID of the event or B to inquire by the name");
               String adminInquire = input.nextLine().toLowerCase();
               if (adminInquire.equals("a")) {
                 System.out.println("Please enter the ID");
-                int temp1 = input.nextInt();
+                temp1 = input.nextInt();
                 input.nextLine();
                 if (t[0] != null) {
                   printAdminInquire(t, temp1, "");
@@ -207,13 +228,18 @@ public class RunTicketMiner{
               } else {
                 System.out.println("No tickets bought yet" + '\n');
               }
-            } else {
+            } else if(adminSearch.equals("create")){
+                    createEvent(p,eventCounter,v);
+            }else {
               System.out.println("Invalid input please try again" + '\n');
             }
           }
           System.out.println("If you want to exit please enter EXIT otherwise enter any letter");
           exit = input.nextLine().toUpperCase();
+
+
         }
+      //excelWriter(p);
     }catch(FileNotFoundException file){
       System.out.println(file);
     }
@@ -225,6 +251,70 @@ public class RunTicketMiner{
    * it returns a boolean confirming if its true or not
    *
    */
+ /* public static void excelWriter(Event e[]){
+    BufferedWriter writer = Files.newBufferedWriter(Paths.get("UpdatedEvent.csv"));
+    writer.write("ID,First Name,Last Name,Username,Password,Money Available,TicketMiner Membership,Concerts Purchased");
+    writer.newLine();
+    for(int i; i < e.length;i++){
+      writer.write(String.join(",",e[i]));
+      writer.newLine();
+    }
+    writer.close();
+  }*/
+  public static Event[] createEvent(Event[] p,int a,Venue[] v){
+    int newCount = a+1;
+    int i = 0;
+    double vipPrice = 0;
+    double goldPrice = 0;
+    double silverPrice = 0;
+    double broncePrice = 0;
+    double generalPrice = 0;
+    Scanner input = new Scanner(System.in);
+    System.out.println("Enter event name");
+    String eventName = input.nextLine();
+    System.out.println("Enter date [MM/DD/YYYY]");
+    String eventDate = input.nextLine();
+    System.out.println("Enter time [XX:XX AM or PM]");
+    String eventTime = input.nextLine();
+    System.out.println("Choose a venue from the following options [Sun Bowl Stadium , Don Haskins Center, Magoffin Auditorium, San Jacinto Plaza\n" +
+            " Centennial Plaza]");
+    String eventVenue = input.nextLine();
+    for( i = 0; i < v.length;i++){
+      if(v[i].getName().equals(eventVenue)){
+        v[i].printInfo();
+      }
+    }
+    while(true){
+      System.out.println("Enter general price [max 500]");
+      generalPrice = input.nextDouble();
+      if(generalPrice <= 500){
+         vipPrice = generalPrice*5;
+         goldPrice = generalPrice*3;
+         silverPrice = generalPrice*2.5;
+         broncePrice = generalPrice*1.5;
+        break;
+      }else{
+        System.out.println("Please try again");
+      }
+    }
+    System.out.println("Do you want fireworks [Y / N]");
+    String fire = input.nextLine().toLowerCase();
+    if(fire.equals("y")){
+      v[i].setCost(v[i].getCost()+500);
+    }
+    Event f = new Event(largestEventID(p),"Sport",eventName,eventDate,eventTime,vipPrice,goldPrice,silverPrice,broncePrice,generalPrice,0);
+    p[newCount] = f;
+    return p;
+  }
+  public static int largestEventID(Event []p){
+    int id = 0;
+    for(int i = 0; i < p.length;i++){
+      if(p[i].getID() > p[i+1].getID()){
+        id = p[i].getID();
+      }
+    }
+    return id;
+  }
   public  static int logInID(Customers[] c,String username, String password) {
     int customerID = 0;
     for(int i = 0; i < c.length; i++) {
@@ -269,30 +359,51 @@ public class RunTicketMiner{
    *
    */
   public static double printById(Event [] e, int t,String seat){
+    Ticket temp[] = new Ticket[1000];
     double price= 0;
     for(int i = 0; i< e.length;i++){
       if(e[i].getID() == t){
         if(seat.equals("vip")){
           price = e[i].getVipPrice();
+          temp[i].setVipTicketsSold(e[i].getVipPrice());
+          temp[i].setVipSeatsSold(temp[i].getVipSeatsSold()+1);
+          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
+          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
 
-        }
+
+          }
         else if(seat.equals("gold")){
           price = e[i].getGoldPrice();
+          temp[i].setGoldTicketsSold(e[i].getGoldPrice());
+          temp[i].setVipSeatsSold(temp[i].getVipSeatsSold()+1) ;
+          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
+          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
         else if(seat.equals("silver")){
           price = e[i].getSilverPrice();
+          temp[i].setSilverTicketsSold(e[i].getSilverPrice());
+          temp[i].setSilverSeatsSold(temp[i].getSilverSeatsSold()+1);
+          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
+          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
         else if(seat.equals("bronze")){
           price = e[i].getBronzePrice();
+          temp[i].setBronzeTicketsSold(e[i].getSilverPrice());
+          temp[i].setSilverSeatsSold(temp[i].getSilverSeatsSold()+1);
+          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
+          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
         else if(seat.equals("general")){
           price = e[i].getGeneralAdmissionPrice();
+          temp[i].setGenAdmTicketsSold(e[i].getGeneralAdmissionPrice());
+          temp[i].setGenAdmSeatsSold(temp[i].getGenAdmSeatsSold()+1);
+          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
+          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
       }
     }
     return price;
   }
-
   /*
    * This method creates an randome alphanumeric string that will be used to be set up as the confirmation number
    * for the ticket
@@ -404,7 +515,8 @@ public class RunTicketMiner{
         double h = Double.parseDouble(tokens[7]);
         double i = Double.parseDouble(tokens[8]);
         double j = Double.parseDouble(tokens[9]);
-        Event m = new Event(a,b,c,d,e,f,g,h,i,j);
+        double k = 0;
+        Event m = new Event(a,b,c,d,e,f,g,h,i,j,k);
         event[adder] = m;
         adder++;
         //m.printTicketInfo();
