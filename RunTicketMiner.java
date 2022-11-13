@@ -95,8 +95,7 @@ public class RunTicketMiner{
                   input.nextLine();
                   if (ticketsBought > 1 && ticketsBought <= 7) {
                     for (int i = 0; i < ticketsBought; i++) {
-                      t[i] = new Ticket(printById(p, ticket, seat), confirmationNumberMethod());
-                      t[i].setQuantityTickets(t[i].getQuantityTickets() - i);
+                      t[i] = new Ticket(i,printById(p, ticket, seat), confirmationNumberMethod());
                       totalTemp += printById(p, ticket, seat);
                       if(totalTemp <= customer[customerID].getMoneyAvailable()) {
                         t[i].printTicketInfo();
@@ -121,7 +120,13 @@ public class RunTicketMiner{
                       System.out.println("Your Total is: " + totalTemp + '\n');
                       System.out.println("Your new balance is: " + customer[customerID].getMoneyAvailable() + '\n' + "Thanks for buying a ticket" + '\n');
                     }
+                    System.out.println("Do you want a ticket [Y / N]"+'\n');
+                    String tickets = input.nextLine().toLowerCase();
+                    if(tickets.charAt(0) == 'y'){
+                      printTicket(ticket,p,t,seat,totalTemp);
+                    }
                     break;
+
                   } else {
                     System.out.println("You can only buy 7 tickets max");
                   }
@@ -151,7 +156,7 @@ public class RunTicketMiner{
                 if (adminInquire.equals("b")) {
                   System.out.println("Please enter the Name");
                   String eventName = input.nextLine();
-                  printCustomerInquire(p, 0, name);
+                  printCustomerInquire(p, 0, eventName);
                 }
               }
               else if (adminSearch.equals("all")) {
@@ -178,15 +183,22 @@ public class RunTicketMiner{
               while(temp != false) {
                 System.out.println("How many tickets are you buying (from 2 to 7 only)");
                 int ticketsBought = input.nextInt();
+                input.nextLine();
                 if (ticketsBought > 1 && ticketsBought <= 7) {
                   for (int i = 0; i < ticketsBought; i++){
-                    t[i] = new Ticket(printById(p, ticket, seat),confirmationNumberMethod());
-
-                    t[i].setQuantityTickets(t[i].getQuantityTickets()-i);
+                    t[i] = new Ticket(i,printById(p, ticket, seat),confirmationNumberMethod());
                     t[i].printTicketInfo();
+                    totalTemp += printById(p, ticket, seat);
                     temp = false;
                   }
+                  totalTemp = totalTemp * texasSalesTax;
+                  System.out.println("Your Total is: " + totalTemp + '\n');
                   System.out.println("Thank you for purchasing your ticket"+'\n');
+                  System.out.println("Do you want a ticket [Y / N]");
+                  String tickets = input.nextLine().toLowerCase();
+                  if(tickets.equals("y")){
+                    printTicket(ticket,p,t,seat,totalTemp);
+                  }
                 } else {
                   System.out.println("You can only buy 7 tickets max"+'\n');
                 }
@@ -261,6 +273,23 @@ public class RunTicketMiner{
     }
     writer.close();
   }*/
+  public static  void printTicket(int id,Event e[],Ticket t[],String type, double totalprice)throws IOException{
+  FileWriter writer = new FileWriter("Electronic Tikcet Summary.txt");
+  for(int i = 0;i < e.length;i++) {
+    if(id == e[i].getID()){
+      writer.write(e[i].getType()+'\n'+e[i].getName()+'\n'+e[i].getDate());
+    }
+  }
+  writer.write(type);
+    for(int i = 1;i < t.length;i++) {
+      String quantityTemp = Integer.toString(t[i].getQuantityTickets());
+      writer.write(quantityTemp + '\n' + t[i].getConfirmationNumber());
+    }
+    String totaltemp = Double.toString(totalprice);
+    writer.write(totaltemp);
+
+  writer.close();
+  }
   public static Event[] createEvent(Event[] p,int a,Venue[] v){
     int newCount = a+1;
     int i = 0;
@@ -309,7 +338,7 @@ public class RunTicketMiner{
   public static int largestEventID(Event []p){
     int id = 0;
     for(int i = 0; i < p.length;i++){
-      if(p[i].getID() > p[i+1].getID()){
+      if(p[i].getID() > p[i+1].getID() && p[i+1] != null){
         id = p[i].getID();
       }
     }
@@ -365,40 +394,18 @@ public class RunTicketMiner{
       if(e[i].getID() == t){
         if(seat.equals("vip")){
           price = e[i].getVipPrice();
-          temp[i].setVipTicketsSold(e[i].getVipPrice());
-          temp[i].setVipSeatsSold(temp[i].getVipSeatsSold()+1);
-          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
-          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
-
-
           }
         else if(seat.equals("gold")){
           price = e[i].getGoldPrice();
-          temp[i].setGoldTicketsSold(e[i].getGoldPrice());
-          temp[i].setVipSeatsSold(temp[i].getVipSeatsSold()+1) ;
-          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
-          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
         else if(seat.equals("silver")){
           price = e[i].getSilverPrice();
-          temp[i].setSilverTicketsSold(e[i].getSilverPrice());
-          temp[i].setSilverSeatsSold(temp[i].getSilverSeatsSold()+1);
-          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
-          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
         else if(seat.equals("bronze")){
           price = e[i].getBronzePrice();
-          temp[i].setBronzeTicketsSold(e[i].getSilverPrice());
-          temp[i].setSilverSeatsSold(temp[i].getSilverSeatsSold()+1);
-          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
-          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
         else if(seat.equals("general")){
           price = e[i].getGeneralAdmissionPrice();
-          temp[i].setGenAdmTicketsSold(e[i].getGeneralAdmissionPrice());
-          temp[i].setGenAdmSeatsSold(temp[i].getGenAdmSeatsSold()+1);
-          temp[i].setTotalTicketsSold(temp[i].getTotalTicketsSold()+1);
-          temp[i].setTotalRevenue(temp[i].getTotalRevenue());
         }
       }
     }
