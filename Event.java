@@ -14,6 +14,9 @@ public class Event extends RunTicketMiner{
   private double silverPrice;
   private double broncePrice;
   private double generalAdmissionPrice;
+  private boolean fireworks;
+
+  private double totalAmountDiscounted;
   //This method initializes the variables 
   public Event(){
     id = 0;
@@ -25,10 +28,12 @@ public class Event extends RunTicketMiner{
     goldPrice = 0;
     silverPrice = 0;
     broncePrice = 0;
-    generalAdmissionPrice = 0;    
+    generalAdmissionPrice = 0;
+    totalAmountDiscounted = 0;
+    fireworks = false;
   }
   //this method creates the object based on the parameters
-  public Event(int a, String b, String c, String d, String e, double f, double g, double h, double i,double j){
+  public Event(int a, String b, String c, String d, String e, double f, double g, double h, double i,double j,double k, boolean l){
     id = a;
     type = b;
     name = c;
@@ -38,9 +43,14 @@ public class Event extends RunTicketMiner{
     goldPrice = g;
     silverPrice = h;
     broncePrice = i;
-    generalAdmissionPrice = j;  
+    generalAdmissionPrice = j;
+    totalAmountDiscounted = k;
+    fireworks = l;
   
   }
+
+
+
   //This method gets the ID from the event
   public int getID(){
    return this.id; 
@@ -80,12 +90,21 @@ public class Event extends RunTicketMiner{
   //This method gets the general admission from the event
   public double getGeneralAdmissionPrice(){
    return this.generalAdmissionPrice; 
-  } 
+  }
+  public double getTotalAmountDiscounted() {
+    return totalAmountDiscounted;
+  }
+  public boolean getFireworks() {
+    return fireworks;
+  }
   //This method sets the ID for the event
   public void setID(int newID){
    this.id = newID; 
   }
   //This method sets the type for the event
+  public void setName(String newName){
+    this.name = newName;
+  }
   public void setType(String newType){
    this.type = newType; 
   }
@@ -114,8 +133,14 @@ public class Event extends RunTicketMiner{
    this.broncePrice = newBroncePrice; 
   }
   //This method sets the general admission for the event
-  public void setGeneralAdmissionPrice(double newGeneralAdmissionPrice){
-   this.generalAdmissionPrice = newGeneralAdmissionPrice; 
+  public void setGeneralAdmissionPrice(double newGeneralAdmissionPrice) {
+    this.generalAdmissionPrice = newGeneralAdmissionPrice;
+  }
+    public void setTotalAmountDiscounted(double totalAmountDiscounted) {
+      this.totalAmountDiscounted = totalAmountDiscounted;
+    }
+  public void setFireworks(boolean fireworks) {
+    this.fireworks = fireworks;
   }
   //This method prints the info based on the parameter of the object
   public  String toString(){
@@ -125,9 +150,18 @@ public class Event extends RunTicketMiner{
   //This method prints only the information necessary to create the ticket for the customer
   public void printTicketInfo(){
     System.out.println("Event ID: "+getID()+'\n'+"Name: "+getName()+'\n'+"Event Type: "+getType()+'\n'+"VIP Seats Price: "+getVipPrice()+'\n'+"Gold Seats Price: "+getGoldPrice()+'\n'+"Silver Seats Price: "+getSilverPrice()+'\n'+
-                       "Bronze Seats: "+getBronzePrice()+'\n'+"General Adm Seats: "+getGeneralAdmissionPrice()+'\n');
+                       "Bronze Seats: "+getBronzePrice()+'\n'+"General Adm Seats: "+getGeneralAdmissionPrice()+'\n'+"Fireworks: "+getFireworks()+'\n');
 
   }
+  public void printNewEventInfo() {
+      System.out.println("Event ID: "+getID()+'\n'+"Name: "+getName()+'\n'+"Date: "+getDate()+'\n'+"Time: "+getTime()+'\n'+ "VIP Seats Price: "+getVipPrice()+'\n'+"Gold Seats Price: "+getGoldPrice()+'\n'+"Silver Seats Price: "+getSilverPrice()+'\n'+
+              "Bronze Seats: "+getBronzePrice()+'\n'+"General Adm Seats: "+getGeneralAdmissionPrice()+'\n'+"Fire Works: " +"Total Cost: ");
   }
+  /*public int costVenue() {
+  return getCost();
+  }*/
+  }
+
+
   
   

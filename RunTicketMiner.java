@@ -1,11 +1,17 @@
 /*
+Ruben Marquez
+Erlan Monarez
+11/13/2022
+Bhanukiran Gurijala
+Programming assigment 2
+
  * This is the main class were the user interacts with the program, I created
  * method to set things by sections to keep the main mostly for the interaction with the user.
  *
  */
+import com.opencsv.CSVWriter;
+
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.lang.*;
 
@@ -20,7 +26,6 @@ public class RunTicketMiner{
       double totalTemp = 0;
       double customerTotalTemp = 0;
       int temp1 = 0;
-
       String exit = "";
       int eventCounter = eventNumber();
       Customers customer[] = customerGenerator();
@@ -95,7 +100,7 @@ public class RunTicketMiner{
                   input.nextLine();
                   if (ticketsBought > 1 && ticketsBought <= 7) {
                     for (int i = 0; i < ticketsBought; i++) {
-                      t[i] = new Ticket(i,printById(p, ticket, seat), confirmationNumberMethod());
+                      t[i] = new Ticket(i+1,printById(p, ticket, seat), confirmationNumberMethod());
                       totalTemp += printById(p, ticket, seat);
                       if(totalTemp <= customer[customerID].getMoneyAvailable()) {
                         t[i].printTicketInfo();
@@ -186,7 +191,7 @@ public class RunTicketMiner{
                 input.nextLine();
                 if (ticketsBought > 1 && ticketsBought <= 7) {
                   for (int i = 0; i < ticketsBought; i++){
-                    t[i] = new Ticket(i,printById(p, ticket, seat),confirmationNumberMethod());
+                    t[i]= new Ticket(i+1,printById(p, ticket, seat),confirmationNumberMethod());
                     t[i].printTicketInfo();
                     totalTemp += printById(p, ticket, seat);
                     temp = false;
@@ -203,7 +208,6 @@ public class RunTicketMiner{
                   System.out.println("You can only buy 7 tickets max"+'\n');
                 }
               }
-
             }
           }
           // ADMINISTRATOR SECTION
@@ -241,7 +245,10 @@ public class RunTicketMiner{
                 System.out.println("No tickets bought yet" + '\n');
               }
             } else if(adminSearch.equals("create")){
-                    createEvent(p,eventCounter,v);
+               Event tempEvent[] = createEvent(p,eventCounter,v);
+               eventCounter++;
+              excelWriter(tempEvent);
+
             }else {
               System.out.println("Invalid input please try again" + '\n');
             }
@@ -251,28 +258,27 @@ public class RunTicketMiner{
 
 
         }
-      //excelWriter(p);
+
     }catch(FileNotFoundException file){
       System.out.println(file);
     }
   }
-  /*
-   *This method is where the user logs in by checking the customers username and password
-   * the parameters are the object of customers the string of the usernma and a string for
-   * the password
-   * it returns a boolean confirming if its true or not
-   *
-   */
- /* public static void excelWriter(Event e[]){
-    BufferedWriter writer = Files.newBufferedWriter(Paths.get("UpdatedEvent.csv"));
-    writer.write("ID,First Name,Last Name,Username,Password,Money Available,TicketMiner Membership,Concerts Purchased");
-    writer.newLine();
-    for(int i; i < e.length;i++){
-      writer.write(String.join(",",e[i]));
-      writer.newLine();
+
+  public static void excelWriter(Event e[]){
+  try {
+      FileWriter outputfile = new FileWriter("UpdatedEventFile.csv");
+    CSVWriter writer = new CSVWriter(outputfile);
+    String[] header = {""};
+    writer.writeNext(header);
+    for(int i = 0; i < e.length;i++) {
+      writer.writeNext(e[i]);
     }
     writer.close();
-  }*/
+  }catch(IOException f) {
+    f.printStackTrace();
+  }
+  }
+
   public static  void printTicket(int id,Event e[],Ticket t[],String type, double totalprice)throws IOException{
   FileWriter writer = new FileWriter("Electronic Tikcet Summary.txt");
   for(int i = 0;i < e.length;i++) {
@@ -281,7 +287,7 @@ public class RunTicketMiner{
     }
   }
   writer.write(type);
-    for(int i = 1;i < t.length;i++) {
+    for(int i = 0;i < t.length;i++) {
       String quantityTemp = Integer.toString(t[i].getQuantityTickets());
       writer.write(quantityTemp + '\n' + t[i].getConfirmationNumber());
     }
@@ -291,7 +297,8 @@ public class RunTicketMiner{
   writer.close();
   }
   public static Event[] createEvent(Event[] p,int a,Venue[] v){
-    int newCount = a+1;
+    Event temp[] =  new Event[a+1];
+    boolean fireTemp = false;
     int i = 0;
     double vipPrice = 0;
     double goldPrice = 0;
@@ -310,12 +317,13 @@ public class RunTicketMiner{
     String eventVenue = input.nextLine();
     for( i = 0; i < v.length;i++){
       if(v[i].getName().equals(eventVenue)){
-        v[i].printInfo();
+        //v[i].printInfo();
       }
     }
     while(true){
       System.out.println("Enter general price [max 500]");
       generalPrice = input.nextDouble();
+      input.nextLine();
       if(generalPrice <= 500){
          vipPrice = generalPrice*5;
          goldPrice = generalPrice*3;
@@ -328,18 +336,35 @@ public class RunTicketMiner{
     }
     System.out.println("Do you want fireworks [Y / N]");
     String fire = input.nextLine().toLowerCase();
-    if(fire.equals("y")){
-      v[i].setCost(v[i].getCost()+500);
+    if(fire.equals("y")) {
+      fireTemp = true;
+      for (i = 0; i < v.length; i++) {
+        if (v[i].getName().equals(eventVenue)) {
+          v[i].setCost(v[i].getCost() + 500);
+        }
+      }
     }
-    Event f = new Event(largestEventID(p),"Sport",eventName,eventDate,eventTime,vipPrice,goldPrice,silverPrice,broncePrice,generalPrice,0);
-    p[newCount] = f;
-    return p;
+    for(int e = 0 ;e < p.length;e++){
+      temp[e] = p[e];
+    }
+    Event f = new Event(largestEventID(p)+1,"Sport",eventName,eventDate,eventTime,vipPrice,goldPrice,silverPrice,broncePrice,generalPrice,0,fireTemp);
+    temp[temp.length-1] = f;
+    temp[temp.length-1].printTicketInfo();
+
+    System.out.println("Event is created thank you"+'\n');
+    return temp;
   }
   public static int largestEventID(Event []p){
     int id = 0;
-    for(int i = 0; i < p.length;i++){
-      if(p[i].getID() > p[i+1].getID() && p[i+1] != null){
-        id = p[i].getID();
+    for (int i = 0; i < p.length; i++)
+    {
+      for (int j = i + 1; j < p.length; j++)
+      {
+        if (p[i].getID() > p[j].getID())
+        {
+          id = p[i].getID();
+
+        }
       }
     }
     return id;
@@ -353,6 +378,13 @@ public class RunTicketMiner{
     }
     return customerID;
   }
+  /*
+   *This method is where the user logs in by checking the customers username and password
+   * the parameters are the object of customers the string of the username and a string for
+   * the password
+   * it returns a boolean confirming if its true or not
+   *
+   */
   public static boolean logIn(Customers[] c,String username, String password) {
     boolean flag = false;
     for(int i=0; i < c.length; i++){
@@ -523,10 +555,11 @@ public class RunTicketMiner{
         double i = Double.parseDouble(tokens[8]);
         double j = Double.parseDouble(tokens[9]);
         double k = 0;
-        Event m = new Event(a,b,c,d,e,f,g,h,i,j,k);
+        boolean l = false;
+        Event m = new Event(a,b,c,d,e,f,g,h,i,j,k,l);
         event[adder] = m;
         adder++;
-        //m.printTicketInfo();
+        m.printTicketInfo();
         //System.out.println(checker);
 
       }

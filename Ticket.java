@@ -9,21 +9,29 @@ public class Ticket extends Event{
   private double totalPrice;
   private String confirmationNumber;
 
+  public int getTotalTicketsSold() {
+    return totalTicketsSold;
+  }
 
-  private int seatsSold;
-  private int vipSeatsSold ;
-  private int goldSeatsSold ;
-  private int silverSeatsSold ;
-  private int bronzeSeatsSold ;
-  private int genAdmSeatsSold ;
-  private double vipTicketsSold ;
-  private double goldTicketsSold ;
-  private double silverTicketsSold ;
-  private double bronzeTicketsSold ;
-  private double genAdmTicketsSold;
-  private double totalRevenue;
-  private double expectedProfit;
-  private double netProfit;
+  public void setTotalTicketsSold(int totalTicketsSold) {
+    this.totalTicketsSold = totalTicketsSold;
+  }
+
+  private int totalTicketsSold = 0;
+  private int seatsSold = 0;
+  private int vipSeatsSold = 0;
+  private int goldSeatsSold = 0;
+  private int silverSeatsSold = 0;
+  private int bronzeSeatsSold = 0;
+  private int genAdmSeatsSold = 0;
+  private double vipTicketsSold = 0;
+  private double goldTicketsSold = 0;
+  private double silverTicketsSold = 0;
+  private double bronzeTicketsSold = 0;
+  private double genAdmTicketsSold = 0;
+  private double totalRevenue = 0;
+  private double expectedProfit = 0;
+  private double netProfit = 0;
   
 
   //this method creates the object based on the parameters
@@ -31,12 +39,7 @@ public class Ticket extends Event{
     quantityTickets = a;
     totalPrice = b;
     confirmationNumber = c;
-  }
-     // This method initializes the variables
-  public Ticket(double b,String c){
-    quantityTickets = 1000;
-    totalPrice = b;
-    confirmationNumber = c;
+
   }
   //This method gets the quantity of tickets that are available 
   public int getQuantityTickets(){
@@ -175,7 +178,7 @@ public class Ticket extends Event{
   }
 
    public void  printTicketInfo() {
-       System.out.println("Quantity tickets: " + getQuantityTickets() + '\n' + "Total Price: " + getTotalPrice() + '\n' + "Confirmation Number: " + getConfirmationNumber());
+       System.out.println("Quantity tickets: " + getQuantityTickets() + '\n' + "Total Price: " + getTotalPrice() + '\n' + "Confirmation Number: " + getConfirmationNumber()+'\n');
    }
    public String toString(){
     return super.toString()+"Total Seats sold: "+seatsSold+'\n'+"Total VIP Seats sold: "+vipSeatsSold+'\n'+"Total Gold Seats sold: "+goldSeatsSold+'\n'+"Total Silver Seats sold: "+silverSeatsSold+'\n'+
