@@ -128,7 +128,7 @@ public class RunTicketMiner{
                     System.out.println("Do you want a ticket [Y / N]"+'\n');
                     String tickets = input.nextLine().toLowerCase();
                     if(tickets.charAt(0) == 'y'){
-                      printTicket(ticket,p,t,seat,totalTemp);
+                      printTicket(ticket,p,t,seat,totalTemp, ticketsBought);
                     }
                     break;
 
@@ -202,7 +202,7 @@ public class RunTicketMiner{
                   System.out.println("Do you want a ticket [Y / N]");
                   String tickets = input.nextLine().toLowerCase();
                   if(tickets.equals("y")){
-                    printTicket(ticket,p,t,seat,totalTemp);
+                    printTicket(ticket,p,t,seat,totalTemp,ticketsBought);
                   }
                 } else {
                   System.out.println("You can only buy 7 tickets max"+'\n');
@@ -268,10 +268,10 @@ public class RunTicketMiner{
   try {
       FileWriter outputfile = new FileWriter("UpdatedEventFile.csv");
     CSVWriter writer = new CSVWriter(outputfile);
-    String[] header = {""};
+    String[] header = {"ID, Type,Name, Date, Time, VIP Price, Gold Price, Silver Price, Bronze Price,General Admission Price,Fireworks"};
     writer.writeNext(header);
     for(int i = 0; i < e.length;i++) {
-      writer.writeNext(e[i]);
+      //writer.writeNext(e[i]);
     }
     writer.close();
   }catch(IOException f) {
@@ -279,7 +279,7 @@ public class RunTicketMiner{
   }
   }
 
-  public static  void printTicket(int id,Event e[],Ticket t[],String type, double totalprice)throws IOException{
+  public static  void printTicket(int id,Event e[],Ticket t[],String type, double totalprice, int numberTickets)throws IOException{
   FileWriter writer = new FileWriter("Electronic Tikcet Summary.txt");
   for(int i = 0;i < e.length;i++) {
     if(id == e[i].getID()){
@@ -287,12 +287,12 @@ public class RunTicketMiner{
     }
   }
   writer.write(type);
-    for(int i = 0;i < t.length;i++) {
-      String quantityTemp = Integer.toString(t[i].getQuantityTickets());
-      writer.write(quantityTemp + '\n' + t[i].getConfirmationNumber());
-    }
+  writer.write(numberTickets);
     String totaltemp = Double.toString(totalprice);
     writer.write(totaltemp);
+    for(int f = 1; f< t.length;f++){
+      writer.write(t[f].getConfirmationNumber());
+    }
 
   writer.close();
   }
@@ -559,7 +559,7 @@ public class RunTicketMiner{
         Event m = new Event(a,b,c,d,e,f,g,h,i,j,k,l);
         event[adder] = m;
         adder++;
-        m.printTicketInfo();
+        //m.printTicketInfo();
         //System.out.println(checker);
 
       }
