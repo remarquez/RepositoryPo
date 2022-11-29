@@ -144,9 +144,28 @@ public class Event extends RunTicketMiner{
   }
   //This method prints the info based on the parameter of the object
   public  String toString(){
-    return "Event ID: "+getID()+'\n'+"Name: "+getName()+'\n'+"Date: "+getDate()+'\n'+"Time: "+getTime()+'\n'+"Event Type: "+getType()+'\n'+
-                      '\n';
+    StringBuilder dataBuilder = new StringBuilder();
+    appendFieldValue(dataBuilder, Integer.toString(id));
+    appendFieldValue(dataBuilder,type);
+    appendFieldValue(dataBuilder,name);
+    appendFieldValue(dataBuilder,date);
+    appendFieldValue(dataBuilder,time);
+    appendFieldValue(dataBuilder,Double.toString(vipPrice));
+    appendFieldValue(dataBuilder,Double.toString(goldPrice));
+    appendFieldValue(dataBuilder,Double.toString(silverPrice));
+    appendFieldValue(dataBuilder,Double.toString(broncePrice));
+    appendFieldValue(dataBuilder,Double.toString(generalAdmissionPrice));
+    appendFieldValue(dataBuilder,Boolean.toString(fireworks));
+
+    return dataBuilder.toString();
      }
+  private void appendFieldValue(StringBuilder dataBuilder, String fieldValue) {
+    if(fieldValue != null) {
+      dataBuilder.append(fieldValue).append(",");
+    } else {
+      dataBuilder.append("").append(",");
+    }
+  }
   //This method prints only the information necessary to create the ticket for the customer
   public void printTicketInfo(){
     System.out.println("Event ID: "+getID()+'\n'+"Name: "+getName()+'\n'+"Event Type: "+getType()+'\n'+"VIP Seats Price: "+getVipPrice()+'\n'+"Gold Seats Price: "+getGoldPrice()+'\n'+"Silver Seats Price: "+getSilverPrice()+'\n'+

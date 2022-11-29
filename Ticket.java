@@ -178,7 +178,7 @@ public class Ticket extends Event{
   }
 
    public void  printTicketInfo() {
-       System.out.println("Quantity tickets: " + getQuantityTickets() + '\n' + "Total Price: " + getTotalPrice() + '\n' + "Confirmation Number: " + getConfirmationNumber()+'\n');
+       System.out.println("Quantity tickets: " + (getQuantityTickets() +1)+ '\n' + "Total Price: " + getTotalPrice() + '\n' + "Confirmation Number: " + getConfirmationNumber()+'\n');
    }
    public String toString(){
     return super.toString()+"Total Seats sold: "+seatsSold+'\n'+"Total VIP Seats sold: "+vipSeatsSold+'\n'+"Total Gold Seats sold: "+goldSeatsSold+'\n'+"Total Silver Seats sold: "+silverSeatsSold+'\n'+

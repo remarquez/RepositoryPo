@@ -100,7 +100,7 @@ public class RunTicketMiner{
                   input.nextLine();
                   if (ticketsBought > 1 && ticketsBought <= 7) {
                     for (int i = 0; i < ticketsBought; i++) {
-                      t[i] = new Ticket(i+1,printById(p, ticket, seat), confirmationNumberMethod());
+                      t[i] = new Ticket(i,printById(p, ticket, seat), confirmationNumberMethod());
                       totalTemp += printById(p, ticket, seat);
                       if(totalTemp <= customer[customerID].getMoneyAvailable()) {
                         t[i].printTicketInfo();
@@ -128,7 +128,7 @@ public class RunTicketMiner{
                     System.out.println("Do you want a ticket [Y / N]"+'\n');
                     String tickets = input.nextLine().toLowerCase();
                     if(tickets.charAt(0) == 'y'){
-                      printTicket(ticket,p,t,seat,totalTemp, ticketsBought);
+                      printTicket(name,lastName,ticket,p,t,seat,totalTemp, ticketsBought);
                     }
                     break;
 
@@ -191,7 +191,7 @@ public class RunTicketMiner{
                 input.nextLine();
                 if (ticketsBought > 1 && ticketsBought <= 7) {
                   for (int i = 0; i < ticketsBought; i++){
-                    t[i]= new Ticket(i+1,printById(p, ticket, seat),confirmationNumberMethod());
+                    t[i]= new Ticket(i,printById(p, ticket, seat),confirmationNumberMethod());
                     t[i].printTicketInfo();
                     totalTemp += printById(p, ticket, seat);
                     temp = false;
@@ -202,7 +202,7 @@ public class RunTicketMiner{
                   System.out.println("Do you want a ticket [Y / N]");
                   String tickets = input.nextLine().toLowerCase();
                   if(tickets.equals("y")){
-                    printTicket(ticket,p,t,seat,totalTemp,ticketsBought);
+                    printTicket(name,lastName,ticket,p,t,seat,totalTemp,ticketsBought);
                   }
                 } else {
                   System.out.println("You can only buy 7 tickets max"+'\n');
@@ -266,12 +266,12 @@ public class RunTicketMiner{
 
   public static void excelWriter(Event e[]){
   try {
-      FileWriter outputfile = new FileWriter("UpdatedEventFile.csv");
-    CSVWriter writer = new CSVWriter(outputfile);
     String[] header = {"ID, Type,Name, Date, Time, VIP Price, Gold Price, Silver Price, Bronze Price,General Admission Price,Fireworks"};
-    writer.writeNext(header);
-    for(int i = 0; i < e.length;i++) {
-      //writer.writeNext(e[i]);
+    PrintWriter writer = new PrintWriter("C:\\Users\\cheet\\Desktop\\Projects\\Lab1\\UpdatedCsv.csv");
+    writer.println(header);
+
+    for (Event sample : e) {
+      writer.println(sample.toString());
     }
     writer.close();
   }catch(IOException f) {
@@ -279,20 +279,21 @@ public class RunTicketMiner{
   }
   }
 
-  public static  void printTicket(int id,Event e[],Ticket t[],String type, double totalprice, int numberTickets)throws IOException{
+  public static  void printTicket(String name,String lastName, int id,Event e[],Ticket t[],String type, double totalprice, int numberTickets)throws IOException{
   FileWriter writer = new FileWriter("Electronic Tikcet Summary.txt");
+    writer.write("Name: "+name+'\n');
+    writer.write("Last Name: "+lastName+'\n');
   for(int i = 0;i < e.length;i++) {
     if(id == e[i].getID()){
-      writer.write(e[i].getType()+'\n'+e[i].getName()+'\n'+e[i].getDate());
+      writer.write("Type: "+e[i].getType()+'\n'+"Name of the Event: "+e[i].getName()+'\n'+"Date: "+e[i].getDate()+'\n');
     }
   }
-  writer.write(type);
-  writer.write(numberTickets);
+  writer.write("Seat: "+type+'\n');
+  writer.write("Number of tickets: "+numberTickets+'\n');
     String totaltemp = Double.toString(totalprice);
-    writer.write(totaltemp);
-    for(int f = 1; f< t.length;f++){
-      writer.write(t[f].getConfirmationNumber());
-    }
+    writer.write("Total: "+totaltemp+'\n');
+    writer.write("Confirmation Number: "+confirmationNumberMethod()+'\n');
+
 
   writer.close();
   }
@@ -355,19 +356,17 @@ public class RunTicketMiner{
     return temp;
   }
   public static int largestEventID(Event []p){
-    int id = 0;
+    int max = p[0].getID();
     for (int i = 0; i < p.length; i++)
     {
-      for (int j = i + 1; j < p.length; j++)
-      {
-        if (p[i].getID() > p[j].getID())
+        if (p[i].getID() > max)
         {
-          id = p[i].getID();
+          max = p[i].getID();
 
         }
-      }
+
     }
-    return id;
+    return max;
   }
   public  static int logInID(Customers[] c,String username, String password) {
     int customerID = 0;
